@@ -1,8 +1,7 @@
 pipeline {
     agent any
     environment {
-        //be sure to replace "willbla" with your own Docker Hub username
-        DOCKER_IMAGE_NAME = "amibas/train-schedule"
+        DOCKER_IMAGE_NAME = "amibas/trainsapp"
     }
     stages {
         stage('Build') {
@@ -49,6 +48,18 @@ pipeline {
                 kubernetesDeploy(
                     kubeconfigId: 'kubeconfig',
                     configs: 'train-schedule-kube-canary.yml',
+                    enableConfigSubstitution: true
+                )
+            }
+        }
+        stage('prometheusdeploy') {
+            when {
+                branch 'master'
+            }
+            steps {
+                kubernetesDeploy(
+                    kubeconfigId: 'kubeconfig',
+                    configs: 'prometheus-deployment.yml',
                     enableConfigSubstitution: true
                 )
             }
